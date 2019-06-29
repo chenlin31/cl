@@ -30,7 +30,8 @@ fi
 for file in input/*.v; do
 
     base=`basename $file .v` # get the filename without extention
-
+    echo "processing $base"
+    
     if test "$enable_yosys" = "true"; then 
       yosys   -p "read_liberty and_or.lib;
                   read_verilog $file; 
@@ -46,6 +47,7 @@ for file in input/*.v; do
     
     if test "$enable_abc" = "true"; then 
       abc    -c  "read yosys_blif/$base.blif; 
+                  comb;
                   strash; 
                   ps; 
                   compress2rs; 
@@ -62,7 +64,7 @@ for file in input/*.v; do
                   collapse_mapping; 
                   lut_resynthesis; 
                   ps -m; 
-                  compress2rs; 
+                  shake; 
                   ps -m; 
                   write_verilog -m cirkit_verilog/$base.v" #cirkit optimization, from aig to optimized MIG-based verilog
     fi
